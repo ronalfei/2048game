@@ -4,7 +4,7 @@
 %% API.
 -export([start_link/0, start/0, up/0,down/0,left/0,right/0]).
 
--export([ drop_zero/1, left/1, right/1]).
+-export([drop_zero/1, left/1, right/1]).
 %% gen_server.
 -export([init/1]).
 -export([handle_call/3]).
@@ -147,20 +147,21 @@ rand_value(_) ->
 rand_grid(State) ->
     V = rand_value(),
     L = state_to_list(State),
-    L1 = rand_grid(V, null, [], L),
+    RandPos = get_random_zero_pos(L),
+    L1 = rand_grid(0, RandPos, V, null, [], L),
     list_to_state(L1).
 
 
-rand_grid(V, null, L, [0|T]) ->
-    rand_grid(V, ok, [V|L], T);
+rand_grid(Count, RandPos, V, null, L, [_H|T]) when Count=:=RandPos ->
+    rand_grid(Count+1, RandPos, V, ok, [V|L], T);
     
-rand_grid(V, null, L, [H|T]) ->
-    rand_grid(V, null, [H|L], T);
+rand_grid(Count, RandPos, V, null, L, [H|T]) ->
+    rand_grid(Count+1, RandPos, V, null, [H|L], T);
 
-rand_grid(V, ok, L, [H|T]) ->
-    rand_grid(V, ok, [H|L], T);
+rand_grid(Count, RandPos, V, ok, L, [H|T]) ->
+    rand_grid(Count+1, RandPos, V, ok, [H|L], T);
 
-rand_grid(_V, ok, L, []) ->
+rand_grid(_Count, _RandPos, _V, ok, L, []) ->
     L1 = lists:reverse(L),
     L1.
     
@@ -218,7 +219,11 @@ add([A, B, C, D]) -> [A, B, C, D].
 
 
 
-
+get_random_zero_pos(L) ->
+    ZeroPosition = [ X || X<-lists:seq(1,16), lists:nth(X,L)==0 ],
+    Num = random:uniform(length(ZeroPosition)),
+    lists:nth(Num, ZeroPosition).
+    
 
 
 

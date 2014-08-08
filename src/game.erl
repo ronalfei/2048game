@@ -41,7 +41,7 @@ start_link() ->
 
 init([]) ->
     State = init_state(),
-io:format("state:~n~p~n", [State]),
+    display(State),
 	{ok, State}.
 
 
@@ -51,6 +51,7 @@ handle_call(up, _From, State) ->
         true  -> S1;
         false -> rand_grid(S1)
     end,
+    display(NS),
     case is_game_over(NS) of
         true -> {reply, gameover, init_state()};
         false ->{reply, NS, NS}
@@ -62,6 +63,7 @@ handle_call(down, _From, State) ->
         true  -> S1;
         false -> rand_grid(S1)
     end,
+    display(NS),
     case is_game_over(NS) of
         true -> {reply, gameover, init_state()};
         false ->{reply, NS, NS}
@@ -73,6 +75,7 @@ handle_call(left, _From, State) ->
         true  -> S1;
         false -> rand_grid(S1)
     end,
+    display(NS),
     case is_game_over(NS) of
         true -> {reply, gameover, init_state()};
         false ->{reply, NS, NS}
@@ -84,6 +87,7 @@ handle_call(right, _From, State) ->
         true  -> S1;
         false -> rand_grid(S1)
     end,
+    display(NS),
     case is_game_over(NS) of
         true -> {reply, gameover, init_state()};
         false ->{reply, NS, NS}
@@ -243,4 +247,7 @@ is_game_over(State) ->
     (up(State) =:= down(State)) and (left(State) =:= right(State)) and (up(State) =:= left(State)).
     
 
+display(State) ->
+    lists:map(fun(X) -> io:format("~n~p", [X]) end, State),
+    io:format("~n").
 

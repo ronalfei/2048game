@@ -40,11 +40,9 @@ start_link() ->
 %% gen_server.
 
 init([]) ->
-    State = [{0,0,0,0},{0,0,0,0},{0,0,0,0},{0,0,0,0}],
-    State1 = rand_grid(State),
-    State2 = rand_grid(State1),
-io:format("state:~n~p~n", [State2]),
-	{ok, State2}.
+    State = init_state(),
+io:format("state:~n~p~n", [State]),
+	{ok, State}.
 
 
 handle_call(up, _From, State) ->
@@ -53,7 +51,10 @@ handle_call(up, _From, State) ->
         true  -> S1;
         false -> rand_grid(S1)
     end,
-	{reply, NS, NS};
+    case is_game_over(NS) of
+        true -> {reply, gameover, init_state()};
+        false ->{reply, NS, NS}
+    end;
 
 handle_call(down, _From, State) ->
     S1 = down(State),
@@ -61,7 +62,10 @@ handle_call(down, _From, State) ->
         true  -> S1;
         false -> rand_grid(S1)
     end,
-	{reply, NS, NS};
+    case is_game_over(NS) of
+        true -> {reply, gameover, init_state()};
+        false ->{reply, NS, NS}
+    end;
 
 handle_call(left, _From, State) ->
     S1 = left(State),
@@ -69,7 +73,10 @@ handle_call(left, _From, State) ->
         true  -> S1;
         false -> rand_grid(S1)
     end,
-	{reply, NS, NS};
+    case is_game_over(NS) of
+        true -> {reply, gameover, init_state()};
+        false ->{reply, NS, NS}
+    end;
 
 handle_call(right, _From, State) ->
     S1 = right(State),
@@ -77,7 +84,10 @@ handle_call(right, _From, State) ->
         true  -> S1;
         false -> rand_grid(S1)
     end,
-	{reply, NS, NS};
+    case is_game_over(NS) of
+        true -> {reply, gameover, init_state()};
+        false ->{reply, NS, NS}
+    end;
 
 
 handle_call(_Request, _From, State) ->
@@ -148,7 +158,7 @@ rand_grid(State) ->
     V = rand_value(),
     L = state_to_list(State),
     RandPos = get_random_zero_pos(L),
-    L1 = rand_grid(0, RandPos, V, null, [], L),
+    L1 = rand_grid(1, RandPos, V, null, [], L),
     list_to_state(L1).
 
 
@@ -225,7 +235,13 @@ get_random_zero_pos(L) ->
     lists:nth(Num, ZeroPosition).
     
 
+init_state() ->
+    State = [{0,0,0,0},{0,0,0,0},{0,0,0,0},{0,0,0,0}],
+    State1 = rand_grid(State),
+    rand_grid(State1).
 
-
+is_game_over(State) ->
+    (up(State) =:= down(State)) and (left(State) =:= right(State)) and (up(State) =:= left(State)).
+    
 
 

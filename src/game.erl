@@ -146,7 +146,6 @@ rand_value() ->
     {A1,A2,A3} = now(),
     random:seed(A1, A2, A3),
     R = random:uniform(),
-    io:format("~p~n", [R]),
     rand_value(R).
 
 rand_value(R) when R > 0.8 ->
@@ -187,8 +186,8 @@ list_to_state(L, [A, B, C, D|T]) ->
 
 list_to_state(L, []) ->
     L1 = lists:reverse(L),
-    lists:map(fun(X) -> io:format("~n~p", [X]) end, L1),
-    io:format("~n"),
+    %lists:map(fun(X) -> io:format("~n~p", [X]) end, L1),
+    %io:format("~n"),
     L1.
     %list_to_tuple(L).
     
